@@ -2,7 +2,7 @@ type Employee @model {
   id: ID!
   firstName: String!
   lastName: String!
-  skills: [Skill]
+  skills: Skill @connection
 }
 
 type Skill @model {

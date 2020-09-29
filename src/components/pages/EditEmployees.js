@@ -9,11 +9,30 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import { Typography, FormControlLabel, Checkbox } from "@material-ui/core";
 import { includes } from "lodash";
 
-const EditEmployee = ({ isOpen, handleClose, onSave }) => {
+const EditEmployee = (props) => {
   const [skills, setSkills] = useState([]);
   const [skillSets, setSkillSets] = useState([]);
+  const [formValue, setFormValue] = useState({
+    firstName: "",
+    lastName: "",
+    skills: {
+      id: "",
+      name: "",
+    },
+  });
+  const {
+    isOpen,
+    handleClose,
+    onSave,
+    match: { params },
+  } = props;
   useEffect(() => {
     fetchData();
+    if (params.id) {
+      if (params.action === "edit") {
+        getEmployeeById(params.id);
+      }
+    }
   }, []);
   const fetchData = async () => {
     const query = ` query{
@@ -29,10 +48,31 @@ const EditEmployee = ({ isOpen, handleClose, onSave }) => {
     const { data } = await API.graphql(graphqlOperation(query));
     setSkills(data?.listSkills?.items);
   };
+
+  const getEmployeeById = async (id) => {
+    const getQuery = `query{
+      getEmployee(id: "${id}") {
+        createdAt
+        firstName
+        id
+        lastName
+        updatedAt
+        skills {
+          id
+          name
+        }
+      }
+    }`;
+    const { data } = await API.graphql(graphqlOperation(getQuery));
+    setFormValue(data?.getEmployee);
+    setSkillSets([...skillSets, data?.getEmployee?.skills.id]);
+  };
+
   const handleChange = (id) => {
     const selectedId = skillSets && skillSets.filter((a) => a === id);
-    if (selectedId) {
-      const removeIds = skillSets && skillSets.filter((a) => a !== selectedId);
+    if (selectedId.length) {
+      const removeIds = skillSets && skillSets.filter((a) => a !== id);
+      console.log(removeIds);
       setSkillSets(removeIds);
     } else {
       setSkillSets([...skillSets, id]);
@@ -41,6 +81,10 @@ const EditEmployee = ({ isOpen, handleClose, onSave }) => {
   const isChecked = (id) => {
     if (includes(skillSets, id)) return true;
     else return false;
+  };
+
+  const handleFormData = (key, value) => {
+    setFormValue({ ...formValue, [key]: value });
   };
   return (
     <div>
@@ -53,15 +97,18 @@ const EditEmployee = ({ isOpen, handleClose, onSave }) => {
         <DialogContent>
           <TextField
             autoFocus
+            value={formValue?.firstName}
             margin="dense"
             id="name"
             label="First Name"
+            onChange={(e) => handleFormData("firstName", e.target.value)}
             type="text"
             fullWidth
           />
           <TextField
-            autoFocus
+            value={formValue?.lastName}
             margin="dense"
+            onChange={(e) => handleFormData("lastName", e.target.value)}
             id="name"
             label="Last Name"
             type="text"
@@ -72,6 +119,7 @@ const EditEmployee = ({ isOpen, handleClose, onSave }) => {
             skills.map((item) => {
               return (
                 <FormControlLabel
+                  key={item?.id}
                   control={
                     <Checkbox
                       checked={isChecked(item?.id)}

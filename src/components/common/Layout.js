@@ -4,7 +4,7 @@ import { NavBar } from "../common";
 const Layout = ({ children, ...rest }) => {
   return (
     <div>
-      <NavBar />
+      <NavBar {...rest} />
       <div>{children}</div>
     </div>
   );
