@@ -1,68 +1,97 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# buildops-test
 
-## Available Scripts
+// run
+cmd git clone https://github.com/Pachiyappan/buildops-test
+cmd: npm install 
+cmd: npm start
 
-In the project directory, you can run:
+/**************************** server ***************************************/
 
-### `yarn start`
+cmd: npm install -g @aws-amplify/cli
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+cmd: amplify configure
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+choose the region
 
-### `yarn test`
+given the username: just like amplify-cli-us-west-2-user or something
+// IAM console will open
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+click "nexpermission" => "nexttag" => "next: review" => "create user" then
 
-### `yarn build`
+you will get access key and secret access key and then paste the key in Appropriate place 
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+afterward given the "profile name" for new user
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+/*************************************************************/
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+/* client Side */
 
-### `yarn eject`
+cmd:  npx create-react-app my-app
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+cmd: amplify init
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+choose your editor, type of app building, enviroment name, framework, directory path, source directory path, ditribution directory path,
+build command and start command
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+then
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+do you want to use an aws profile? ans: yes
+choose the profile which you created
 
-## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+cmd: amplify add api
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+choose "graphql"
 
-### Code Splitting
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+Please select from one of the below mentioned services: GraphQL
+? Provide API name: client
+? Choose the default authorization type for the API API key
+? Enter a description for the API key: 
+? After how many days from now the API key should expire (1-365): 7
+? Do you want to configure advanced settings for the GraphQL API No, I am done.
+? Do you have an annotated GraphQL schema? No
+? Do you want a guided schema creation? Yes
+? What best describes your project: Single object with fields (e.g., “Todo” with ID, name, description)
+? Do you want to edit the schema now? (Y/n) y
 
-### Analyzing the Bundle Size
+create a schema and save
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+then 
 
-### Making a Progressive Web App
+cmd: amplify push
+ will build all your local backend resources and provision it in the cloud
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+cmd: amplify publish
+ will build all your local backend and frontend resources (if you have hosting category added) and provision it in the cloud 
 
-### Advanced Configuration
+after amplify push cmd given, you receive this message "GraphQL schema compiled successfully"
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
 
-### Deployment
+GraphQL endpoint:  https://yc7soabqqzhlpk6u6f2ygloqde.appsync-api.ap-south-1.amazonaws.com/graphql
+GraphQL API KEY: da2-ci5czua2oje7hir7pgkp3x5exm
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+lets go to see the appsync in aws console
+your api card show on there and try the queries
 
-### `yarn build` fails to minify
+let we go to next,
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+cmd: npm add aws-amplify
+
+cmd: npm i @apollo/react-hooks
+
+cmd: npm i graphql 
+
+cmd: npm i graphql-tag  
+
+cmd: npm i apollo-link-context
+
+cmd: npm i apollo-cache-inmemory
+
+cmd: npm i apollo-link-http
+
+cmd: npm i apollo-client
+
+cmd: npm i react-apollo
+
+Thank You.... !
