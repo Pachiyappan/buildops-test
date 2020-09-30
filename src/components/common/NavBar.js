@@ -50,6 +50,7 @@ const NavBar = ({ location, ...rest }) => {
         <Toolbar>
           {menuConfig.map((menu) => (
             <Link
+              key={menu.id}
               to={menu.path}
               className={`${classes.link} ${
                 isActiveMenu(menu?.selectedMenu) ? classes.activeMenu : ""

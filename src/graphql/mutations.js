@@ -1,5 +1,16 @@
+import gql from "@apollo/client";
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
+
+export const CREATE_EMPLOYEE = gql`
+  mutation createEmployee($firstName: String!, $lastName: String!) {
+    createEmployee(input: { firstName: $firstName, lastName: $lastName }) {
+      id
+      firstName
+      lastName
+    }
+  }
+`;
 
 export const createEmployee = /* GraphQL */ `
   mutation CreateEmployee(

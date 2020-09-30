@@ -93,7 +93,9 @@ const EditEmployee = (props) => {
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle id="form-dialog-title">Create new employee</DialogTitle>
+        <DialogTitle id="form-dialog-title">
+          {params.action === "edit" ? "Update" : "Create new"} employee
+        </DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -138,6 +140,7 @@ const EditEmployee = (props) => {
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
+
           <Button onClick={onSave} color="primary">
             Save
           </Button>

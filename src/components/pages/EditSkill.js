@@ -11,6 +11,7 @@ const EditSkill = (props) => {
   const [skillName, setSkillName] = useState("");
   const {
     isOpen,
+    onSave,
     handleClose,
     match: { params },
   } = props;
@@ -33,23 +34,6 @@ const EditSkill = (props) => {
     setSkillName(data?.getSkill?.name);
   };
 
-  const createSkill = async () => {
-    console.log(skillName);
-    const mutation = `mutation{
-        createSkill(input: {name: ${skillName}}) {
-            id
-            name
-            updatedAt
-            createdAt
-          }
-      }`;
-    await API.graphql(graphqlOperation(mutation)).then((res) => {
-      handleClose();
-    });
-  };
-  const handleFormData = (key, value) => {
-    setSkillName({ ...skillName, value });
-  };
   return (
     <div>
       <Dialog
@@ -57,7 +41,9 @@ const EditSkill = (props) => {
         onClose={handleClose}
         aria-labelledby="form-dialog-title"
       >
-        <DialogTitle id="form-dialog-title">Create new employee</DialogTitle>
+        <DialogTitle id="form-dialog-title">
+          {params.action === "edit" ? "Update" : "Create new"} skill
+        </DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -74,7 +60,11 @@ const EditSkill = (props) => {
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button onClick={createSkill} color="primary">
+          <Button
+            type="submit"
+            onClick={() => onSave(skillName)}
+            color="primary"
+          >
             Save
           </Button>
         </DialogActions>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useQuery, useMutation, gql } from "@apollo/client";
 import { API, graphqlOperation } from "aws-amplify";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -34,11 +35,39 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
+export const GET_SKILLS = gql`
+  query MyQuery {
+    listSkills {
+      items {
+        id
+        name
+      }
+    }
+  }
+`;
+const ADD_SKILL = gql`
+  mutation create($name: String!) {
+    createSkill(input: { name: $name }) {
+      id
+      name
+    }
+  }
+`;
+const UPDATE_SKILL = gql`
+  mutation create($id: ID!, $name: String!) {
+    updateSkill(input: { id: $id, name: $name }) {
+      id
+      name
+    }
+  }
+`;
 const Skills = (props) => {
   const classes = useStyles();
+  const { data, refetch } = useQuery(GET_SKILLS);
+  const [addSkill] = useMutation(ADD_SKILL);
+  const [updateSkill] = useMutation(UPDATE_SKILL);
   const [isOpenEditDialog, setOpenEditDialog] = useState(false);
   const [isDelete, setDelete] = useState(null);
-  const [skills, setSkills] = useState([]);
   const {
     history,
     match: { params },
@@ -48,21 +77,7 @@ const Skills = (props) => {
     if (params.id) {
       setOpenEditDialog(true);
     }
-    fetchData();
   }, [params]);
-
-  const fetchData = async () => {
-    const query = ` query{
-        listSkills {
-            items {
-                id
-                name
-            }
-        }
-    }`;
-    const { data } = await API.graphql(graphqlOperation(query));
-    setSkills(data?.listSkills?.items);
-  };
 
   const handleClose = () => {
     setOpenEditDialog(false);
@@ -72,7 +87,16 @@ const Skills = (props) => {
   const handleDelete = (id) => {
     setDelete(id);
   };
-  const onSave = () => {};
+
+  const saveSkill = async (skillName) => {
+    if (params.action === "edit") {
+      updateSkill({ variables: { id: params.id, name: skillName } });
+    } else {
+      addSkill({ variables: { name: skillName } });
+    }
+    refetch();
+    handleClose();
+  };
   const onDelete = async () => {
     const deleteEmployee = `mutation{
       deleteSkill(input: {id: "${isDelete}"}) {
@@ -81,7 +105,7 @@ const Skills = (props) => {
   }`;
     await API.graphql(graphqlOperation(deleteEmployee)).then((res) => {
       setDelete(null);
-      fetchData();
+      refetch();
     });
   };
 
@@ -107,8 +131,8 @@ const Skills = (props) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {skills &&
-              skills.map((row) => (
+            {data?.listSkills?.items &&
+              data?.listSkills?.items.map((row) => (
                 <TableRow key={row.id}>
                   <TableCell component="th" scope="row">
                     {row?.name}
@@ -128,7 +152,7 @@ const Skills = (props) => {
         <EditSkill
           isOpen={isOpenEditDialog}
           handleClose={handleClose}
-          onSave={onSave}
+          onSave={saveSkill}
           {...props}
         />
       )}
