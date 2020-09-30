@@ -16,9 +16,10 @@ Amplify.configure(config);
 
 const cache = new InMemoryCache();
 const httpLink = new HttpLink({
-  uri: "http://192.168.43.233:20002/graphql",
+  uri:
+    "https://yc7soabqqzhlpk6u6f2ygloqde.appsync-api.ap-south-1.amazonaws.com/graphql",
   headers: {
-    "X-Api-Key": "da2-fakeApiId123456",
+    "X-Api-Key": "da2-ci5czua2oje7hir7pgkp3x5exm",
   },
 });
 
@@ -26,7 +27,7 @@ const authLink = setContext((_, { headers }) => {
   return {
     headers: {
       ...headers,
-      authorization: `Bearer da2-fakeApiId123456`,
+      authorization: `Bearer da2-ci5czua2oje7hir7pgkp3x5exm`,
     },
   };
 });
