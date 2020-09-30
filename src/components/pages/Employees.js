@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useQuery, useMutation, gql } from "@apollo/client";
 import { API, graphqlOperation } from "aws-amplify";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -12,7 +13,7 @@ import { Delete, Edit } from "@material-ui/icons";
 import { EditEmployee } from "./EditEmployees";
 import { DialogModal } from "../common";
 import { Typography, Toolbar } from "@material-ui/core";
-import { PrimaryButton } from "../common";
+import { PrimaryButton, EmptyMessage } from "../common";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -34,11 +35,58 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
+export const GET_EMPLOYEES = gql`
+  query {
+    listEmployees {
+      items {
+        createdAt
+        firstName
+        id
+        lastName
+        updatedAt
+        skills {
+          id
+          name
+          updatedAt
+          createdAt
+        }
+      }
+    }
+  }
+`;
+const ADD_EMPLOYEE = gql`
+  mutation create($firstName: String!, $lastName: String!) {
+    createEmployee(input: { firstName: $firstName, lastName: $lastName }) {
+      firstName
+      id
+      lastName
+      updatedAt
+      createdAt
+    }
+  }
+`;
+
+const UPDATE_EMPLOYEE = gql`
+  mutation update($id: ID!, $firstName: String!, $lastName: String!) {
+    updateEmployee(
+      input: { id: $id, firstName: $firstName, lastName: $lastName }
+    ) {
+      firstName
+      id
+      lastName
+      updatedAt
+      createdAt
+    }
+  }
+`;
+
 const Employees = (props) => {
   const classes = useStyles();
+  const { data, refetch } = useQuery(GET_EMPLOYEES);
+  const [addEmployee] = useMutation(ADD_EMPLOYEE);
+  const [updateEmployee] = useMutation(UPDATE_EMPLOYEE);
   const [isOpenEditDialog, setOpenEditDialog] = useState(false);
   const [isDelete, setDelete] = useState(null);
-  const [employees, setEmplyees] = useState([]);
   const {
     history,
     match: { params },
@@ -48,30 +96,7 @@ const Employees = (props) => {
     if (params.id) {
       setOpenEditDialog(true);
     }
-    fetchData();
   }, [params]);
-
-  const fetchData = async () => {
-    const query = ` query{
-      listEmployees {
-        items {
-          createdAt
-          firstName
-          id
-          lastName
-          updatedAt
-          skills {
-            id
-            name
-            updatedAt
-            createdAt
-          }
-        }
-      }
-    }`;
-    const { data } = await API.graphql(graphqlOperation(query));
-    setEmplyees(data?.listEmployees?.items);
-  };
 
   const handleClose = () => {
     setOpenEditDialog(false);
@@ -81,7 +106,26 @@ const Employees = (props) => {
   const handleDelete = (id) => {
     setDelete(id);
   };
-  const onSave = () => {};
+  const saveEmployee = async (data) => {
+    if (params.action === "edit") {
+      updateEmployee({
+        variables: {
+          id: params.id,
+          firstName: data?.firstName,
+          lastName: data?.lastName,
+        },
+      });
+    } else {
+      addEmployee({
+        variables: {
+          firstName: data?.firstName,
+          lastName: data?.lastName,
+        },
+      });
+    }
+    refetch();
+    handleClose();
+  };
   const onDelete = async () => {
     const deleteEmployee = `mutation{
       deleteEmployee(input: {id: "${isDelete}"}) {
@@ -90,8 +134,8 @@ const Employees = (props) => {
   }`;
     await API.graphql(graphqlOperation(deleteEmployee)).then((res) => {
       setDelete(null);
-      fetchData();
     });
+    refetch();
   };
 
   return (
@@ -118,9 +162,9 @@ const Employees = (props) => {
               </TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
-            {employees &&
-              employees.map((row) => (
+          {data?.listEmployees?.items.length ? (
+            <TableBody>
+              {data?.listEmployees?.items.map((row) => (
                 <TableRow key={row.id}>
                   <TableCell component="th" scope="row">
                     {`${row?.firstName} ${row?.lastName}`}
@@ -134,14 +178,17 @@ const Employees = (props) => {
                   </TableCell>
                 </TableRow>
               ))}
-          </TableBody>
+            </TableBody>
+          ) : (
+            <EmptyMessage message="No data found" />
+          )}
         </Table>
       </TableContainer>
       {isOpenEditDialog && (
         <EditEmployee
           isOpen={isOpenEditDialog}
           handleClose={handleClose}
-          onSave={onSave}
+          onSave={saveEmployee}
           {...props}
         />
       )}

@@ -65,14 +65,13 @@ const EditEmployee = (props) => {
     }`;
     const { data } = await API.graphql(graphqlOperation(getQuery));
     setFormValue(data?.getEmployee);
-    setSkillSets([...skillSets, data?.getEmployee?.skills.id]);
+    setSkillSets([...skillSets, data?.getEmployee?.skills?.id]);
   };
 
   const handleChange = (id) => {
     const selectedId = skillSets && skillSets.filter((a) => a === id);
     if (selectedId.length) {
       const removeIds = skillSets && skillSets.filter((a) => a !== id);
-      console.log(removeIds);
       setSkillSets(removeIds);
     } else {
       setSkillSets([...skillSets, id]);
@@ -141,7 +140,11 @@ const EditEmployee = (props) => {
             Cancel
           </Button>
 
-          <Button onClick={onSave} color="primary">
+          <Button
+            type="submit"
+            onClick={() => onSave(formValue)}
+            color="primary"
+          >
             Save
           </Button>
         </DialogActions>

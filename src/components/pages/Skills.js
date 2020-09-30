@@ -13,7 +13,7 @@ import { Delete, Edit } from "@material-ui/icons";
 import { EditSkill } from "./EditSkill";
 import { DialogModal } from "../common";
 import { Typography, Toolbar } from "@material-ui/core";
-import { PrimaryButton } from "../common";
+import { PrimaryButton, EmptyMessage } from "../common";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -108,7 +108,6 @@ const Skills = (props) => {
       refetch();
     });
   };
-
   return (
     <div>
       <Toolbar>
@@ -130,9 +129,9 @@ const Skills = (props) => {
               </TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
-            {data?.listSkills?.items &&
-              data?.listSkills?.items.map((row) => (
+          {data?.listSkills?.items.length ? (
+            <TableBody>
+              {data?.listSkills?.items.map((row) => (
                 <TableRow key={row.id}>
                   <TableCell component="th" scope="row">
                     {row?.name}
@@ -145,7 +144,10 @@ const Skills = (props) => {
                   </TableCell>
                 </TableRow>
               ))}
-          </TableBody>
+            </TableBody>
+          ) : (
+            <EmptyMessage message="No data found" />
+          )}
         </Table>
       </TableContainer>
       {isOpenEditDialog && (
