@@ -17,6 +17,11 @@ import { PrimaryButton, EmptyMessage } from "../common";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
+    tableCont: {
+      marginLeft: theme.spacing(3),
+      marginRight: theme.spacing(3),
+      width: "auto",
+    },
     table: {
       minWidth: 650,
     },
@@ -55,8 +60,18 @@ export const GET_EMPLOYEES = gql`
   }
 `;
 const ADD_EMPLOYEE = gql`
-  mutation create($firstName: String!, $lastName: String!) {
-    createEmployee(input: { firstName: $firstName, lastName: $lastName }) {
+  mutation create(
+    $employeeSkillsId: ID
+    $firstName: String!
+    $lastName: String!
+  ) {
+    createEmployee(
+      input: {
+        employeeSkillsId: $employeeSkillsId
+        firstName: $firstName
+        lastName: $lastName
+      }
+    ) {
       firstName
       id
       lastName
@@ -67,9 +82,19 @@ const ADD_EMPLOYEE = gql`
 `;
 
 const UPDATE_EMPLOYEE = gql`
-  mutation update($id: ID!, $firstName: String!, $lastName: String!) {
+  mutation update(
+    $id: ID!
+    $employeeSkillsId: ID
+    $firstName: String!
+    $lastName: String!
+  ) {
     updateEmployee(
-      input: { id: $id, firstName: $firstName, lastName: $lastName }
+      input: {
+        id: $id
+        employeeSkillsId: $employeeSkillsId
+        firstName: $firstName
+        lastName: $lastName
+      }
     ) {
       firstName
       id
@@ -113,6 +138,7 @@ const Employees = (props) => {
           id: params.id,
           firstName: data?.firstName,
           lastName: data?.lastName,
+          employeeSkillsId: data?.employeeSkillsId,
         },
       });
     } else {
@@ -120,6 +146,7 @@ const Employees = (props) => {
         variables: {
           firstName: data?.firstName,
           lastName: data?.lastName,
+          employeeSkillsId: data?.employeeSkillsId,
         },
       });
     }
@@ -149,7 +176,7 @@ const Employees = (props) => {
           onClick={() => history.push(`/employees/new`)}
         />
       </Toolbar>
-      <TableContainer component={Paper}>
+      <TableContainer className={classes.tableCont} component={Paper}>
         <Table className={classes.table} aria-label="simple table">
           <TableHead className={classes.tableHeader}>
             <TableRow>

@@ -17,6 +17,11 @@ import { PrimaryButton, EmptyMessage } from "../common";
 
 const useStyles = makeStyles((theme) =>
   createStyles({
+    tableCont: {
+      marginLeft: theme.spacing(3),
+      marginRight: theme.spacing(3),
+      width: "auto",
+    },
     table: {
       minWidth: 650,
     },
@@ -119,7 +124,7 @@ const Skills = (props) => {
           onClick={() => history.push(`/skills/new`)}
         />
       </Toolbar>
-      <TableContainer component={Paper}>
+      <TableContainer className={classes.tableCont} component={Paper}>
         <Table className={classes.table} aria-label="simple table">
           <TableHead className={classes.tableHeader}>
             <TableRow>

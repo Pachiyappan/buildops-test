@@ -9,6 +9,10 @@ const useStyles = makeStyles((theme) =>
         margin: theme.spacing(1),
       },
     },
+    button: {
+      background: "#009688",
+      color: "#fff",
+    },
   })
 );
 
@@ -17,7 +21,7 @@ const PrimaryButton = (props) => {
   const { text, onClick } = props;
   return (
     <div className={classes.root}>
-      <Button variant="contained" color="primary" onClick={onClick}>
+      <Button  variant="contained" onClick={onClick}>
         {text}
       </Button>
     </div>

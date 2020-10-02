@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { createStyles, makeStyles } from "@material-ui/core/styles";
 import { API, graphqlOperation } from "aws-amplify";
 import Button from "@material-ui/core/Button";
 import TextField from "@material-ui/core/TextField";
@@ -7,9 +8,20 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { Typography, FormControlLabel, Checkbox } from "@material-ui/core";
-import { includes } from "lodash";
+import { includes, isEmpty } from "lodash";
+
+const useStyles = makeStyles((theme) =>
+  createStyles({
+    errorText: {
+      fontSize: "14px",
+      color: "#f44336",
+    },
+  })
+);
 
 const EditEmployee = (props) => {
+  const classes = useStyles();
+  const [isError, setIsError] = useState(false);
   const [skills, setSkills] = useState([]);
   const [skillSets, setSkillSets] = useState([]);
   const [formValue, setFormValue] = useState({
@@ -72,9 +84,9 @@ const EditEmployee = (props) => {
     const selectedId = skillSets && skillSets.filter((a) => a === id);
     if (selectedId.length) {
       const removeIds = skillSets && skillSets.filter((a) => a !== id);
-      setSkillSets(removeIds);
+      setSkillSets(removeIds.filter(Boolean));
     } else {
-      setSkillSets([...skillSets, id]);
+      setSkillSets([...skillSets, id].filter(Boolean));
     }
   };
   const isChecked = (id) => {
@@ -84,6 +96,21 @@ const EditEmployee = (props) => {
 
   const handleFormData = (key, value) => {
     setFormValue({ ...formValue, [key]: value });
+  };
+
+  const onSubmit = () => {
+    if (isEmpty(formValue.firstName)) {
+      setIsError(true);
+    } else if (isEmpty(formValue.lastName)) {
+      setIsError(true);
+    } else if (!skillSets.length) {
+      setIsError(true);
+    } else {
+      onSave({
+        ...formValue,
+        employeeSkillsId: skillSets.length ? skillSets[0] : "",
+      });
+    }
   };
   return (
     <div>
@@ -97,22 +124,26 @@ const EditEmployee = (props) => {
         </DialogTitle>
         <DialogContent>
           <TextField
+            error={isError && !formValue?.firstName}
             autoFocus
             value={formValue?.firstName}
             margin="dense"
             id="name"
             label="First Name"
             onChange={(e) => handleFormData("firstName", e.target.value)}
+            helperText="Please enter firstname"
             type="text"
             fullWidth
           />
           <TextField
+            error={isError && !formValue?.lastName}
             value={formValue?.lastName}
             margin="dense"
             onChange={(e) => handleFormData("lastName", e.target.value)}
             id="name"
             label="Last Name"
             type="text"
+            helperText="Please enter lastname"
             fullWidth
           />
           <Typography style={{ paddingTop: "1rem" }}>Skills</Typography>
@@ -134,17 +165,18 @@ const EditEmployee = (props) => {
                 />
               );
             })}
+          {isError && skillSets.length < 1 && (
+            <div className={classes.errorText}>
+              Please select atleast one skill.
+            </div>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
 
-          <Button
-            type="submit"
-            onClick={() => onSave(formValue)}
-            color="primary"
-          >
+          <Button type="submit" onClick={onSubmit} color="primary">
             Save
           </Button>
         </DialogActions>

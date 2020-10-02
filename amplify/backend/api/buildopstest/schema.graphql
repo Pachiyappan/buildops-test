@@ -1,7 +1,7 @@
 type Employee @model {
   id: ID!
-  firstName: String!
-  lastName: String!
+  firstName: String
+  lastName: String
   skills: Skill @connection
 }
 
